@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 from pandas import DataFrame, read_sql_query
 from geopandas import GeoDataFrame, GeoSeries
 
@@ -47,9 +48,12 @@ class SatelliteImages(GeospatialDataManager):
         fields_ids = list()
         image_paths = list()
         response_paths = list()
+        
+        current_date = datetime.now().strftime('%Y%m%d')
 
         for directory in directories:
-            dir_path = os.path.join(IMAGES_DIR, directory)
+            directory_with_date = f"{directory}_{current_date}"
+            dir_path = os.path.join(IMAGES_DIR, directory_with_date)
             os.makedirs(dir_path, exist_ok=True)
 
             polygon_wkt = geo_data[geo_data[DIR_NAME_COL] == directory].iloc[0][GEOM_COL]
