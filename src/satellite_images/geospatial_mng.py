@@ -1,5 +1,5 @@
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from datetime import date, timedelta
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -8,19 +8,20 @@ from shapely import Polygon
 from sentinelhub import (CRS, BBox, bbox_to_dimensions, Geometry,
                          SentinelHubRequest, DataCollection, MimeType, SHConfig)
 
-from src.dem import (DIR_NAME_COL, FIELD_ID_COL, IMAGE_COL, RESPONSE_COL,
-                     DB_TABLE, DB_SCHEMA, INDEX_COL, DEFAULT_IMAGE_SIZE, MAX_DIMENSION)
+from satellite_images import (DIR_NAME_COL, FIELD_ID_COL, IMAGE_COL, RESPONSE_COL,
+                              DEST_TABLE, DEST_SCHEMA, INDEX_COL, DEFAULT_IMAGE_SIZE, MAX_DIMENSION)
 
 logger = logging.getLogger(__name__)
 
 
 class GeospatialDataManager:
+
     @staticmethod
     def get_geo_metadata(
             polygon: Polygon,
             field_tenant: str,
             image_size: bool = False
-    ) -> Tuple[BBox, Tuple[float, float], GeoDataFrame] | Tuple[BBox, GeoDataFrame]:
+    ) -> tuple[BBox, tuple[int | Any, int | Any] | tuple[int, int], Geometry] | tuple[BBox, Any, Geometry]:
         bbox = BBox(bbox=polygon.bounds, crs=CRS.WGS84)
         geometry = Geometry(geometry=polygon, crs=CRS.WGS84)
         if not image_size:
@@ -46,19 +47,19 @@ class GeospatialDataManager:
 
     @staticmethod
     def get_dates() -> tuple[date, date]:
-        date_from = date.today() - timedelta(days=10)
-        date_to = date.today() - timedelta(days=9)
+        date_from = date.today() - timedelta(days=2)
+        date_to = date.today() - timedelta(days=1)
         return date_from, date_to
 
     @staticmethod
-    def dem_image_request(
+    def satellite_image_request(
             sh_config: SHConfig,
             eval_script: str,
             date_from: date,
             date_to: date,
             bbox: BBox,
             size: Tuple[int, int],
-            geometry: GeoDataFrame,
+            geometry: Geometry,
             dir_path: str
 
     ):
@@ -67,7 +68,7 @@ class GeospatialDataManager:
                 evalscript=eval_script,
                 input_data=[
                     SentinelHubRequest.input_data(
-                        data_collection=DataCollection.DEM,
+                        data_collection=DataCollection.SENTINEL2_L2A,
                         time_interval=(date_from, date_to)
                     )
                 ],
@@ -105,10 +106,10 @@ class GeospatialDataManager:
             }
         )
         metadata_df.to_sql(
-            name=DB_TABLE,
+            name=DEST_TABLE,
             con=url,
-            schema=DB_SCHEMA,
-            if_exists='append',
+            schema=DEST_SCHEMA,
+            if_exists='replace',
             index_label=INDEX_COL,
             index=False
         )
