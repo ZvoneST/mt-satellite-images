@@ -71,8 +71,8 @@ class SatelliteImages(GeospatialDataManager):
             )
 
             for response_num in os.listdir(dir_path):
-                meta_path = os.path.join(IMAGES_DIR, directory, response_num, RESPONSE_OUTPUT)
-                image_path = os.path.join(IMAGES_DIR, directory, response_num, IMAGE_OUTPUT)
+                meta_path = os.path.join(IMAGES_DIR, directory_with_date, response_num, RESPONSE_OUTPUT)
+                image_path = os.path.join(IMAGES_DIR, directory_with_date, response_num, IMAGE_OUTPUT)
                 fields_ids.append(int(directory.split('_')[0]))
                 image_paths.append(image_path)
                 response_paths.append(meta_path)
