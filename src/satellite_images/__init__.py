@@ -45,7 +45,7 @@ EVAL_SCRIPT_VI = """
     function setup() {
         return {
             input: [{
-                bands: ["B04", "B08", "CLM"]
+                bands: ["B04", "B08"]
             }],
             output: {
                 bands: 3
@@ -54,7 +54,7 @@ EVAL_SCRIPT_VI = """
     }
 
     function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B08, sample.CLM];
+        return [sample.B04, sample.B08];
     }
     """
 
