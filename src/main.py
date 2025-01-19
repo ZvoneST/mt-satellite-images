@@ -2,7 +2,6 @@ import logging
 from sys import exit
 
 from satellite_images.satellite_images import SatelliteImages
-from utils.paths import SENTINEL_CONFIGS
 from utils.connector import DatabaseConnector
 
 SOURCE_LABEL = 'src'
