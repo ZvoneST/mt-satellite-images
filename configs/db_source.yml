@@ -1,5 +1,4 @@
 driver_name: 'postgresql+psycopg2'
-database: 'raw_zone'
-host: '192.168.50.95'
+database: 'farm_management'
 port: '5432'
 additional_options: 'charset=cp1250'
