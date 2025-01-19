@@ -1,9 +1,12 @@
 import logging
 from sys import exit
 
-from src.dem.dem_images import SentinelHubDEMImages
-from src.utils.paths import SENTINEL_CONFIGS
-from src.utils.connector import DatabaseConnector
+from satellite_images.satellite_images import SatelliteImages
+from utils.paths import SENTINEL_CONFIGS
+from utils.connector import DatabaseConnector
+
+SOURCE_LABEL = 'src'
+DESTINATION_LABEL = 'dest'
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,17 +16,18 @@ logging.basicConfig(
 logger = logging.getLogger('main')
 
 
-db_connector = DatabaseConnector()
+src_conn = DatabaseConnector(db_label=SOURCE_LABEL)
+dest_conn = DatabaseConnector(db_label=DESTINATION_LABEL)
 
-data = SentinelHubDEMImages(
-    config_path=SENTINEL_CONFIGS,
-    connector=db_connector
+data = SatelliteImages(
+    src_con=src_conn,
+    dest_con=dest_conn
 )
 
 
 if __name__ == "__main__":
     try:
-        data.get_dem_images()
+        data.get_satellite_images()
     except Exception as e:
         logger.critical('Unhandled exception occurred.', exc_info=e)
         exit(-1)
