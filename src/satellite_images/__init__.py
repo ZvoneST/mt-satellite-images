@@ -1,5 +1,5 @@
 __all__ = [
-    'POLIGON_COL',
+    'POLYGON_COL',
     'FIELD_ID_COL',
     'DIR_NAME_COL',
     'TENANT_COL',
@@ -11,62 +11,60 @@ __all__ = [
     'IMAGE_COL',
     'RESPONSE_OUTPUT',
     'RESPONSE_COL',
-    'EVALSCRIPT_DEM',
+    'EVAL_SCRIPT_VI',
     'FIELDS_QUERY',
-    'DB_TABLE',
-    'DB_SCHEMA',
+    'DEST_TABLE',
+    'SRC_SCHEMA',
+    'DEST_SCHEMA',
     'CREATED_DATE',
     'INDEX_COL'
 ]
 
-POLIGON_COL = 'PoligonWKT'
-FIELD_ID_COL = 'FieldId'
-DIR_NAME_COL = 'FieldID_TenantID'
-TENANT_COL = 'TenantId'
+POLYGON_COL = 'field_polygon_wkt'
+FIELD_ID_COL = 'field_id'
+DIR_NAME_COL = 'field_id_agro_organization_id'
+TENANT_COL = 'agro_organization_id'
 GEODF_CRS = 'EPSG:4326'
 GEOM_COL = 'geometry'
 DEFAULT_IMAGE_SIZE = [512, 512]
 MAX_DIMENSION = 2500
 IMAGE_OUTPUT = 'response.tiff'
-IMAGE_COL = 'ImageDEMPath'
+IMAGE_COL = 'image_path'
 RESPONSE_OUTPUT = 'request.json'
-RESPONSE_COL = 'ResponseMetaPath'
-DB_TABLE = 'PathsToDEM'
-DB_SCHEMA = 'dbo'
-CREATED_DATE = 'CreatedOn'
-INDEX_COL = 'PathsToDEMId'
+RESPONSE_COL = 'response_meta_path'
+DEST_TABLE = 'satellite_metadata'
+SRC_SCHEMA = 'management'
+DEST_SCHEMA = 'landing'
+CREATED_DATE = 'created_on'
+INDEX_COL = 'sat_metadata_id'
 
 
-EVALSCRIPT_DEM = """
-        //VERSION=3
-        function setup() {
-          return {
-            input: ["DEM"],
-            output:{
-              id: "default",
-              bands: 1,
-              sampleType: SampleType.FLOAT32
+EVAL_SCRIPT_VI = """
+    //VERSION=3
+
+    function setup() {
+        return {
+            input: [{
+                bands: ["B02", "B03", "B04"]
+            }],
+            output: {
+                bands: 3
             }
-          }
-        }
-        
-        function evaluatePixel(sample) {
-          return [sample.DEM]
-        }
-"""
+        };
+    }
 
+    function evaluatePixel(sample) {
+        return [sample.B04, sample.B03, sample.B02];
+    }
+    """
+
+# noinspection SqlNoDataSourceInspection
 FIELDS_QUERY = '''
-        SELECT 
-            f.FieldId
-            ,f.TenantId
-            ,f.PoligonWKT
-        FROM 
-            dbo.Fields AS f
-        LEFT JOIN 
-            dbo.PathsToDEM AS dem 
-            ON f.FieldId = dem.FieldId
-        WHERE 
-            f.PoligonWKT IS NOT NULL
-            AND f.TenantId != 0
-            AND dem.FieldId IS NULL;
+    SELECT 
+        f.field_id,
+        f.agro_organization_id,
+        f.field_name,
+        f.field_polygon_wkt
+    FROM 
+        management.fields f
     '''
