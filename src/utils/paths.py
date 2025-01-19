@@ -12,4 +12,4 @@ _CONFIGS_DIR = os.path.join(_ROOT_DIR, 'configs')
 SOURCE_CONFIGS = os.path.join(_CONFIGS_DIR, 'db_source.yml')
 DESTINATION_CONFIGS = os.path.join(_CONFIGS_DIR, 'db_destination.yml')
 
-IMAGES_DIR = '/home/zvone/sentinel_images/landing/'
+IMAGES_DIR = '/home/mtsi/sentinel_images/landing/'

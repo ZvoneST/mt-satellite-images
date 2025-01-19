@@ -1,16 +1,24 @@
-FROM python:3.12-slim-bullseye
+FROM python:3.10-slim-bullseye
 
-RUN useradd --create-home mtsi
-RUN mkdir /mtsi/sat-images
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libffi-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /home/mtsi/sentinel_images/landing
+
 WORKDIR /home/mtsi/sat-images
-USER mtsi
 
 COPY configs/ configs/
 COPY src/ src/
 COPY requirements.txt requirements.txt
 
-ENV PYTHONPATH "${PYTHONPATH}:/home/mtsi/sat-images/src"
+ENV IMAGES_DIR=/home/mtsi/sentinel_images/landing
+ENV PYTHONPATH="${PYTHONPATH}:/home/mtsi/sat-images/src"
+
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt && pip cache purge
 
-CMD [ "python", "src/main.py" ]
+CMD ["python", "src/main.py"]
